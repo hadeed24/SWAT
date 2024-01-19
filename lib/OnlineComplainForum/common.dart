@@ -7,11 +7,17 @@ class T_T extends StatelessWidget {
       required this.heading,
       required this.hint_text,
       this.keyboard_type,
-      required this.SecondWidget});
+      required this.SecondWidget,
+      required this.function});
   final String heading;
   final String hint_text;
   final TextInputType? keyboard_type;
   final bool SecondWidget;
+  final Function function;
+
+
+// then, in the build method:
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,10 +27,10 @@ class T_T extends StatelessWidget {
           child: Text(
             heading,
             textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.black, fontSize: 15),
+            style: const TextStyle(color: Colors.black, fontSize: 15),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 5,
         ),
         SecondWidget
@@ -32,16 +38,18 @@ class T_T extends StatelessWidget {
             : TextField(
                 keyboardType: keyboard_type ?? TextInputType.text,
                 decoration: InputDecoration(
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: Colors.blue), // Border color when focused
                   ),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: Colors.grey), // Border color when not focused
                   ),
-                  border: OutlineInputBorder(),
                   hintText: hint_text,
+                  errorText: function(),
                 ),
               ),
       ],
