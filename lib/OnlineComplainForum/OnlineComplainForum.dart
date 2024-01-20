@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swat/OnlineComplainForum/common.dart';
 
 class OnlineComplainForum extends StatefulWidget {
   const OnlineComplainForum({Key? key}) : super(key: key);
@@ -8,7 +9,8 @@ class OnlineComplainForum extends StatefulWidget {
 }
 
 class _OnlineComplainForumState extends State<OnlineComplainForum> {
-  String selectedDistrict = 'Dadu'; // Initial selected district
+  String? selectedDistrict; // Initial selected district
+// Initial selected district
   List<String> districts = [
     "Dadu",
     "Jacobabad",
@@ -34,29 +36,16 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
   };
   bool isSubmitButtonEnabled() {
 // Check if all text fields are filled
-    return nameController.text.isNotEmpty &&
-        fatherNameController.text.isNotEmpty &&
-        cnicController.text.isNotEmpty &&
-        selectedTaluka!.isNotEmpty &&
-        contactNoController.text.isNotEmpty &&
-        complaintController.text.isNotEmpty;
-  }
-
-  final _controller = TextEditingController();
-
-  String? get errorText {
-// at any time, we can get the text from _controller.value.text
-    final text = _controller.value.text;
-// Note: you can do your own custom validation here
-// Move this logic this outside the widget for more testable code
-    if (text.isEmpty) {
-      return 'Can\'t be empty';
+    if (selectedTaluka?.isNotEmpty == true) {
+      return nameController.text.isNotEmpty &&
+          fatherNameController.text.isNotEmpty &&
+          cnicController.text.isNotEmpty &&
+          contactNoController.text.isNotEmpty &&
+          complaintController.text.isNotEmpty;
     }
-    if (text.length < 4) {
-      return 'Too short';
-    }
-// return null if the text is valid
-    return null;
+
+// Default return if selectedTaluka is null or empty
+    return false;
   }
 
   var name;
@@ -67,25 +56,35 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     nameController.addListener(() {
-      name = nameController.text;
+      setState(() {
+        name = nameController.text;
+      });
     });
     fatherNameController.addListener(() {
-      fathername = fatherNameController.text;
+      setState(() {
+        fathername = fatherNameController.text;
+      });
     });
     cnicController.addListener(() {
-      cnic = cnicController;
+      setState(() {
+        cnic = cnicController.text;
+      });
     });
     contactNoController.addListener(() {
-      cellnumber = contactNoController;
+      setState(() {
+        cellnumber = contactNoController.text;
+      });
     });
     complaintController.addListener(() {
-      complaint = complaintController;
+      setState(() {
+        complaint = complaintController.text;
+      });
     });
   }
 
+  @override
   void dispose() {
     nameController.dispose();
     fatherNameController.dispose();
@@ -120,75 +119,38 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
               ),
               T_T(
                 heading: 'Name',
-              ),
-              TextFormField(
-                controller: nameController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: 'Enter your name',
-                ),
+                hint_text: 'Enter your name',
+                SecondWidget: false,
+                controller: nameController, maxlength: 30,
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               T_T(
                 heading: 'Father Name/Husband Name',
-              ),
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: 'Enter your Father Name/Husband Name',
-                ),
+                hint_text: 'Enter your Father Name/Husband Name',
+                SecondWidget: false,
+                controller: fatherNameController, maxlength: 30,
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
               ),
               T_T(
                 heading: 'CNIC',
-              ),
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: '41306xxxxxxxx',
-                ),
+                hint_text: '41306-xxxxxxx-x',
+                SecondWidget: false,
+                controller: cnicController, maxlength: 15,
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               T_T(
                 heading: 'District',
+                hint_text: 'Select District',
+                SecondWidget: true,
+                controller: nameController, maxlength: 0,
               ),
               DropdownButtonFormField<String>(
                 value: selectedDistrict,
@@ -219,10 +181,14 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 ),
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               T_T(
                 heading: 'Taluka',
+                hint_text: 'Select Taluka',
+                SecondWidget: true,
+                controller: nameController, maxlength: 0,
               ),
               DropdownButtonFormField<String>(
                 value: selectedTaluka,
@@ -251,71 +217,50 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 ),
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               T_T(
                 heading: 'Contact No',
-              ),
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: '031211xxxxx',
-                ),
+                hint_text: '0312-11xxxxx',
+                SecondWidget: false,
+                controller: contactNoController, maxlength: 13,
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               T_T(
                 heading: 'Nature of Complaint',
-              ),
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: 'Enter your Complain',
-                ),
+                hint_text: 'Enter your Complain',
+                SecondWidget: false,
+                controller: complaintController, maxlength: 500,
               ),
               const SizedBox(
-                height: 15,
+                height: 7,
+
               ),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    var name = nameController.text;
-                    print(name);
-                    var fname = fatherNameController.text;
-                    print("\n" + fname);
-                    var cnic = cnicController.text;
-                    print("\n" + cnic);
-                    const snackBar = SnackBar(
-                      backgroundColor: Color.fromARGB(255, 53, 53, 53),
-                      content: Text('Submitted'),
-                      duration: Duration(seconds: 2),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
+                  onPressed: isSubmitButtonEnabled()
+                      ? () {
+                          setState(() {
+                            nameController.clear();
+                            fatherNameController.clear();
+                            cnicController.clear();
+                            contactNoController.clear();
+                            complaintController.clear();
+                            selectedDistrict = null;
+                          });
+                          const snackBar = SnackBar(
+                            backgroundColor: Color.fromARGB(255, 53, 53, 53),
+                            content: Text('Submitted'),
+                            duration: Duration(seconds: 2),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
@@ -332,9 +277,10 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
               const SizedBox(
                 height: 4,
               ),
-              Container(
+              SizedBox(
                 height: 40,
-                child: Text("hhhhhh $name \n "),
+                child: Text(
+                    " $name  $fathername  $cnic  $complaint $cellnumber $selectedDistrict $selectedTaluka  "),
               )
             ],
           ),
@@ -343,34 +289,37 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
     );
   }
 }
-
+/* 
 final controller = TextEditingController();
 
 /// reuseble widgets/////////////////////
 class T_T extends StatelessWidget {
-  T_T({
-    super.key,
-    required this.heading,
-  });
-  final String heading;
+T_T({
+super.key,
+required this.heading,
+});
+final String heading;
+
+
 
 // then, in the build method:
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            heading,
-            textAlign: TextAlign.left,
-            style: const TextStyle(color: Colors.black, fontSize: 15),
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-      ],
-    );
-  }
+@override
+Widget build(BuildContext context) {
+return Column(
+children: [
+Container(
+alignment: Alignment.centerLeft,
+child: Text(
+heading,
+textAlign: TextAlign.left,
+style: const TextStyle(color: Colors.black, fontSize: 15),
+),
+),
+const SizedBox(
+height: 5,
+),
+],
+);
 }
+}
+*/
