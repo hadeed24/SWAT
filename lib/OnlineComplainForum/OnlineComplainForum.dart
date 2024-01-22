@@ -39,8 +39,8 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
     if (selectedTaluka?.isNotEmpty == true) {
       return nameController.text.isNotEmpty &&
           fatherNameController.text.isNotEmpty &&
-          cnicController.text.isNotEmpty &&
-          contactNoController.text.isNotEmpty &&
+          cnicController.text.length == 15 &&
+          contactNoController.text.length == 12 &&
           complaintController.text.isNotEmpty;
     }
 
@@ -117,21 +117,41 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                   filterQuality: FilterQuality.high,
                 ),
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Online Complain Forum",
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
               T_T(
                 heading: 'Name',
                 hint_text: 'Enter your name',
                 SecondWidget: false,
-                controller: nameController, maxlength: 30,
+                controller: nameController,
+                maxlength: 30,
+                maxlines: 1,
+                isCnic: false,
+                needFormatter: false,
               ),
               const SizedBox(
                 height: 7,
-
               ),
               T_T(
                 heading: 'Father Name/Husband Name',
                 hint_text: 'Enter your Father Name/Husband Name',
                 SecondWidget: false,
-                controller: fatherNameController, maxlength: 30,
+                controller: fatherNameController,
+                maxlength: 30,
+                maxlines: 1,
+                isCnic: false,
+                needFormatter: false,
               ),
               const SizedBox(
                 height: 7,
@@ -140,19 +160,27 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 heading: 'CNIC',
                 hint_text: '41306-xxxxxxx-x',
                 SecondWidget: false,
-                controller: cnicController, maxlength: 15,
+                controller: cnicController,
+                maxlength: 15,
+                maxlines: 1,
+                isCnic: true,
+                needFormatter: true,
               ),
               const SizedBox(
                 height: 7,
-
               ),
               T_T(
                 heading: 'District',
                 hint_text: 'Select District',
                 SecondWidget: true,
-                controller: nameController, maxlength: 0,
+                controller: nameController,
+                maxlength: 0,
+                maxlines: 1,
+                isCnic: false,
+                needFormatter: false,
               ),
               DropdownButtonFormField<String>(
+                hint: const Text("Select District"),
                 value: selectedDistrict,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -182,15 +210,19 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
               ),
               const SizedBox(
                 height: 7,
-
               ),
               T_T(
                 heading: 'Taluka',
                 hint_text: 'Select Taluka',
                 SecondWidget: true,
-                controller: nameController, maxlength: 0,
+                controller: nameController,
+                maxlength: 0,
+                maxlines: 1,
+                isCnic: false,
+                needFormatter: false,
               ),
               DropdownButtonFormField<String>(
+                hint: const Text("Select Taluka"),
                 value: selectedTaluka,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -218,27 +250,32 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
               ),
               const SizedBox(
                 height: 7,
-
               ),
               T_T(
                 heading: 'Contact No',
                 hint_text: '0312-11xxxxx',
                 SecondWidget: false,
-                controller: contactNoController, maxlength: 13,
+                controller: contactNoController,
+                maxlength: 12,
+                maxlines: 1,
+                isCnic: false,
+                needFormatter: true,
               ),
               const SizedBox(
                 height: 7,
-
               ),
               T_T(
                 heading: 'Nature of Complaint',
                 hint_text: 'Enter your Complain',
                 SecondWidget: false,
-                controller: complaintController, maxlength: 500,
+                controller: complaintController,
+                maxlength: 500,
+                maxlines: 5,
+                isCnic: false,
+                needFormatter: false,
               ),
               const SizedBox(
                 height: 7,
-
               ),
               SizedBox(
                 width: double.infinity,
@@ -252,9 +289,10 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                             contactNoController.clear();
                             complaintController.clear();
                             selectedDistrict = null;
+                            selectedTaluka = null;
                           });
                           const snackBar = SnackBar(
-                            backgroundColor: Color.fromARGB(255, 53, 53, 53),
+                            backgroundColor: Colors.green,
                             content: Text('Submitted'),
                             duration: Duration(seconds: 2),
                           );
@@ -278,7 +316,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 height: 4,
               ),
               SizedBox(
-                height: 40,
+                height: 60,
                 child: Text(
                     " $name  $fathername  $cnic  $complaint $cellnumber $selectedDistrict $selectedTaluka  "),
               )

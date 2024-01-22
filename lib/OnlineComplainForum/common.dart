@@ -11,6 +11,9 @@ class T_T extends StatelessWidget {
     required this.SecondWidget,
     required TextEditingController controller,
     required this.maxlength,
+    required this.maxlines,
+    required this.isCnic,
+    required this.needFormatter,
   }) : controller = controller;
 
   final String heading;
@@ -19,6 +22,9 @@ class T_T extends StatelessWidget {
   final bool SecondWidget;
   final TextEditingController controller;
   final int maxlength;
+  final int maxlines;
+  final bool isCnic;
+  final bool needFormatter;
   String? get errorText {
 // at any time, we can get the text from _controller.value.text
     final text = controller.value.text;
@@ -53,7 +59,14 @@ class T_T extends StatelessWidget {
         SecondWidget
             ? Container()
             : TextFormField(
-              
+                inputFormatters: needFormatter
+                    ? [
+                        FilteringTextInputFormatter.digitsOnly,
+                        inputFormater(isCnic),
+                      ]
+                    : [],
+                minLines: 1,
+                maxLines: maxlines,
                 maxLength: maxlength, // Set the maximum length
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 buildCounter: (BuildContext context,
@@ -80,5 +93,46 @@ class T_T extends StatelessWidget {
               ),
       ],
     );
+  }
+}
+
+// this class will be called, when their is change in textField
+class inputFormater extends TextInputFormatter {
+  inputFormater(this.isCnic);
+
+  final bool isCnic;
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+    String enteredData = newValue.text; // get data enter by used in textField
+    StringBuffer buffer = StringBuffer();
+
+    for (int i = 0; i < enteredData.length; i++) {
+      // add each character into String buffer
+      buffer.write(enteredData[i]);
+      int index = i + 1;
+      if (isCnic && index == 12 && enteredData.length != index) {
+        // add space after 4th digit
+        buffer.write("-");
+      }
+      if (isCnic && index == 5 && enteredData.length != index) {
+        // add space after 4th digit
+        buffer.write("-");
+      }
+      if (!isCnic && index == 4 && enteredData.length != index) {
+        // add space after 4th digit
+        buffer.write("-");
+      }
+    }
+
+    return TextEditingValue(
+        text: buffer.toString(), // final generated credit card number
+        selection: TextSelection.collapsed(
+            offset: buffer.toString().length) // keep the cursor at end
+        );
   }
 }
