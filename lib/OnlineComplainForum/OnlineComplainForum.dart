@@ -139,6 +139,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 maxlines: 1,
                 isCnic: false,
                 needFormatter: false,
+                keyboard_type: TextInputType.name,
               ),
               const SizedBox(
                 height: 7,
@@ -152,6 +153,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 maxlines: 1,
                 isCnic: false,
                 needFormatter: false,
+                keyboard_type: TextInputType.name,
               ),
               const SizedBox(
                 height: 7,
@@ -165,6 +167,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 maxlines: 1,
                 isCnic: true,
                 needFormatter: true,
+                keyboard_type: TextInputType.number,
               ),
               const SizedBox(
                 height: 7,
@@ -260,6 +263,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 maxlines: 1,
                 isCnic: false,
                 needFormatter: true,
+                keyboard_type: TextInputType.number,
               ),
               const SizedBox(
                 height: 7,
