@@ -8,12 +8,12 @@ class T_T extends StatelessWidget {
     required this.hint_text,
     this.keyboard_type,
     required this.SecondWidget,
-    required TextEditingController controller,
+    required this.controller,
     required this.maxlength,
     required this.maxlines,
     required this.isCnic,
     required this.needFormatter,
-  }) : controller = controller;
+  });
 
   final String heading;
   final String hint_text;
@@ -24,21 +24,18 @@ class T_T extends StatelessWidget {
   final int maxlines;
   final bool isCnic;
   final bool needFormatter;
-  String? get errorText {
-// at any time, we can get the text from _controller.value.text
-    final text = controller.value.text;
-// Note: you can do your own custom validation here
-// Move this logic this outside the widget for more testable code
-    if (text.isEmpty) {
-      return 'Can\'t be empty';
+
+  String? _validateInput(
+    String? value,
+  ) {
+    if (isCnic && value!.length < 15) {
+      return 'aaa';
     }
-    if (text.length < 4) {
-      return 'Too short';
+    if (isCnic == false && value!.length < 12) {
+      return 'ggg';
     }
-// return null if the text is valid
     return null;
   }
-// then, in the build method:
 
   @override
   Widget build(BuildContext context) {
@@ -57,39 +54,43 @@ class T_T extends StatelessWidget {
         ),
         SecondWidget
             ? Container()
-            : TextFormField(
-                inputFormatters: needFormatter
-                    ? [
-                        FilteringTextInputFormatter.digitsOnly,
-                        inputFormater(isCnic),
-                      ]
-                    : [],
-                minLines: 1,
-                maxLines: maxlines,
-                maxLength: maxlength, // Set the maximum length
-                maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                buildCounter: (BuildContext context,
-                    {required int currentLength,
-                    required bool isFocused,
-                    required int? maxLength}) {
-                  return const SizedBox();
-                },
-                controller: controller,
-                keyboardType: keyboard_type ?? TextInputType.text,
-                decoration: InputDecoration(
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.blue), // Border color when focused
+            : Form(
+              child: TextFormField(
+                  inputFormatters: needFormatter
+                      ? [
+                          FilteringTextInputFormatter.digitsOnly,
+                          inputFormater(isCnic),
+                        ]
+                      : [],
+                  minLines: 1,
+                  maxLines: maxlines,
+                  maxLength: maxlength, // Set the maximum length
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  buildCounter: (BuildContext context,
+                      {required int currentLength,
+                      required bool isFocused,
+                      required int? maxLength}) {
+                    return const SizedBox();
+                  },
+                  controller: controller,
+                  keyboardType: keyboard_type ?? TextInputType.text,
+                  decoration: InputDecoration(
+                    focusedBorder:  OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderSide: BorderSide(
+                          color: Colors.blue), // Border color when focused
+                    ),
+                    enabledBorder:  OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderSide: BorderSide(
+                          color: Colors.grey), // Border color when not focused
+                    ),
+                    hintText: hint_text,
                   ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(
-                        color: Colors.grey), // Border color when not focused
-                  ),
-                  hintText: hint_text,
+             //     validator: needFormatter ? _validateInput : null,
+             //     autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
-              ),
+            ),
       ],
     );
   }

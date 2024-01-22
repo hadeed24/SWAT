@@ -140,6 +140,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
                 isCnic: false,
                 needFormatter: false,
                 keyboard_type: TextInputType.name,
+                
               ),
               const SizedBox(
                 height: 7,
