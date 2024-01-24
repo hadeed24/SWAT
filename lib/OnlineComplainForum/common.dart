@@ -25,17 +25,9 @@ class T_T extends StatelessWidget {
   final bool isCnic;
   final bool needFormatter;
 
-  String? _validateInput(
-    String? value,
-  ) {
-    if (isCnic && value!.length < 15) {
-      return 'aaa';
-    }
-    if (isCnic == false && value!.length < 12) {
-      return 'ggg';
-    }
-    return null;
-  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,43 +46,41 @@ class T_T extends StatelessWidget {
         ),
         SecondWidget
             ? Container()
-            : Form(
-              child: TextFormField(
-                  inputFormatters: needFormatter
-                      ? [
-                          FilteringTextInputFormatter.digitsOnly,
-                          inputFormater(isCnic),
-                        ]
-                      : [],
-                  minLines: 1,
-                  maxLines: maxlines,
-                  maxLength: maxlength, // Set the maximum length
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  buildCounter: (BuildContext context,
-                      {required int currentLength,
-                      required bool isFocused,
-                      required int? maxLength}) {
-                    return const SizedBox();
-                  },
-                  controller: controller,
-                  keyboardType: keyboard_type ?? TextInputType.text,
-                  decoration: InputDecoration(
-                    focusedBorder:  OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(
-                          color: Colors.blue), // Border color when focused
-                    ),
-                    enabledBorder:  OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(
-                          color: Colors.grey), // Border color when not focused
-                    ),
-                    hintText: hint_text,
+            : TextFormField(
+                inputFormatters: needFormatter
+                    ? [
+                        FilteringTextInputFormatter.digitsOnly,
+                        inputFormater(isCnic),
+                      ]
+                    : [],
+                minLines: 1,
+                maxLines: maxlines,
+                maxLength: maxlength, // Set the maximum length
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                buildCounter: (BuildContext context,
+                    {required int currentLength,
+                    required bool isFocused,
+                    required int? maxLength}) {
+                  return const SizedBox();
+                },
+                controller: controller,
+                keyboardType: keyboard_type ?? TextInputType.text,
+                decoration: InputDecoration(
+                  focusedBorder:  OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderSide: BorderSide(
+                        color:  Colors.blue), // Border color when focused
                   ),
-             //     validator: needFormatter ? _validateInput : null,
-             //     autovalidateMode: AutovalidateMode.onUserInteraction,
+                  enabledBorder:  OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderSide: BorderSide(
+                        color: Colors.grey), // Border color when not focused
+                  ),
+                  hintText: hint_text,
                 ),
-            ),
+                         //     validator: needFormatter ? _validateInput : null,
+                         //     autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
       ],
     );
   }
