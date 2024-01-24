@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,37 +14,122 @@ class OnlineComplainForum extends StatefulWidget {
 class _OnlineComplainForumState extends State<OnlineComplainForum> {
   String? selectedDistrict; // Initial selected district
 // Initial selected district
-  List<String> districts = [
-    "Badin",
-    "Dadu",
-    "Ghotki",
-    "Hyderabad",
-    "Jacobabad",
-    "Jamshoro",
-    "Kashmore",
-    "Khairpur",
-    "Larkana",
-    "Matiari",
-    "Mirpur Khas",
-    "Naushahro Feroze",
-    "Shaheed Benazirabad",
-    "Qambar Shahdadkot",
-    "Sanghar",
-    "Shikarpur",
-    "Sukkur",
-    "Tando Allahyar",
-    "Tando Muhammad Khan",
-    "Tharparkar",
-    "Thatta",
-    "Umerkot",
-    "Sujawal",
-    "Malir",
-  ];
+  List<String> districts = [];
+  Future<void> postData() async {
+    final Map<String, dynamic> requestBody = {
+      "name": name,
+      "cnic": cnic,
+      "district": selectedDistrict,
+      "taluka": _selectedTaluka,
+      "contact": cellnumber,
+      "nature_of_complaint": complaint,
+    };
+
+    final response = await http.post(
+      Uri.parse("https://cms.swatagriculture.gos.pk/api/store-complain"),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+// Handle success, you can show a success message or perform any other actions.
+      print('Complaint submitted successfully');
+    } else {
+// Handle error, you can show an error message or perform any other actions.
+      print('Failed to submit complaint');
+    }
+  }
 
   List<String> Taluka = [];
+  String hintTaluka = "Select Taluka";
+  String hintdistricts = "Select Districts";
   String? _selectedTaluka;
 
-  Future<void> fetchData(String selectedDistrict) async {
+  Future opendialogbox() => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: SizedBox(
+            height: 80,
+            width: 100,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Complain Registered Successful",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 30,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          nameController.clear();
+// fatherNameController.clear();
+                          cnicController.clear();
+                          contactNoController.clear();
+                          complaintController.clear();
+                          selectedDistrict = null;
+                          _selectedTaluka = null;
+                          Navigator.of(context).pop();
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(5.0), // Set border radius
+                        ),
+                      ),
+                      child: const Text(
+                        "Close",
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                            color: Colors.white,
+                            letterSpacing: 1,
+                            fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Future<void> fetchDistrict() async {
+    final response = await http
+        .get(Uri.parse("https://cms.swatagriculture.gos.pk/api/get-districts"));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      FetchAPI Districtapi = FetchAPI.fromJson(data);
+
+      if (Districtapi.success == true) {
+        List<String> unsortedData = Districtapi.data ?? [];
+        unsortedData.sort(); // Sort the data
+
+        setState(() {
+          districts = unsortedData;
+          _selectedTaluka =
+              districts.isNotEmpty ? districts.first : null; // Change this line
+        });
+      }
+    } else {
+      setState(() {
+        hintdistricts = "Failed to load data";
+      });
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<void> fetchTaluka(String selectedDistrict) async {
     final response = await http.get(Uri.parse(
         "https://cms.swatagriculture.gos.pk/api/get-talukas?district=$selectedDistrict"));
 
@@ -64,25 +148,16 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
         });
       }
     } else {
+      setState(() {
+        hintTaluka = "Failed to load data";
+      });
       throw Exception('Failed to load data');
     }
   }
 
-  String? selectedTaluka; // Initial selected district
-/*  Map<String, List<String>> subcategories = {
-"Dadu": ["Dadu 1.1", "Dadu1.2", "Dadu 1.3"],
-"Jacobabad": ["Jacobabad 2.1", "Jacobabad 2.2", "Jacobabad 2.3"],
-"Larkana": ["Larkana 1.1", "Larkana 1.2", "Larkana 1.3"],
-"Jamshoro": ["Jamshoro 2.1", "Jamshoro 2.2", "Jamshoro 2.3"],
-"Tharparkar": ["Tharparkar 1.1", "Tharparkar 1.2", "Tharparkar 1.3"],
-"Korangi": ["Korangi 2.1", "Korangi 2.2", "Korangi 2.3"],
-"Malir": ["Malir 1.1", "Malir 1.2", "Malir 1.3"],
-"Keamari": ["Keamari 2.1", "Keamari 2.2", "Keamari 2.3"],
-// Add more subcategories as needed
-}; */
   bool isSubmitButtonEnabled() {
 // Check if all text fields are filled
-    if (selectedTaluka?.isNotEmpty == true) {
+    if (_selectedTaluka?.isNotEmpty == true) {
       return nameController.text.isNotEmpty &&
 //fatherNameController.text.isNotEmpty &&
           cnicController.text.length == 15 &&
@@ -107,6 +182,7 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
   @override
   void initState() {
     super.initState();
+    fetchDistrict();
     nameController.addListener(() {
       setState(() {
         name = nameController.text;
@@ -180,7 +256,7 @@ fathername = fatherNameController.text;
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 13,
               ),
               const Text(
                 "Online Complain Forum",
@@ -190,11 +266,11 @@ fathername = fatherNameController.text;
                     fontWeight: FontWeight.w500),
               ),
               const SizedBox(
-                height: 10,
+                height: 18,
               ),
               T_T(
-                heading: 'Name',
-                hint_text: 'Enter your name',
+                heading: 'Name & Father/Husband Name',
+                hint_text: 'Enter your name & your father/husband',
                 SecondWidget: false,
                 controller: nameController,
                 maxlength: 30,
@@ -250,14 +326,14 @@ height: 7,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: RedCnic
                             ? Colors.red
                             : Colors.blue), // Border color when focused
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: RedCnic
                             ? Colors.red
@@ -280,14 +356,13 @@ height: 7,
                 needFormatter: false,
               ),
               DropdownButtonFormField<String>(
-                hint: const Text("Select District"),
+                hint: Text(hintdistricts),
                 value: selectedDistrict,
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedDistrict = newValue!;
 // Update talukas based on the selected district
-                    fetchData("$selectedDistrict") ?? [];
-                    selectedTaluka = talukas.isNotEmpty ? talukas.first : '';
+                    fetchTaluka("$selectedDistrict") ?? [];
                   });
                 },
                 items: districts.map((String district) {
@@ -332,7 +407,7 @@ height: 7,
                     borderSide: BorderSide(color: Colors.grey),
                   ),
                 ),
-                hint: const Text("Select Taluka"),
+                hint: Text(hintTaluka),
                 value: _selectedTaluka,
                 items: Taluka.map((String value) {
                   return DropdownMenuItem<String>(
@@ -347,34 +422,6 @@ height: 7,
                   });
                 },
               ),
-
-/* DropdownButtonFormField<String>(
-hint: const Text("Select Taluka"),
-value: selectedTaluka,
-onChanged: (String? newValue) {
-setState(() {
-selectedTaluka = newValue!;
-});
-},
-items: talukas.map((String taluka) {
-return DropdownMenuItem<String>(
-value: taluka,
-child: Text(
-taluka,
-style: const TextStyle(fontWeight: FontWeight.w400),
-),
-);
-}).toList(),
-decoration: const InputDecoration(
-focusedBorder: OutlineInputBorder(
-borderSide: BorderSide(
-color: Colors.blue), // Border color when focused
-),
-enabledBorder: OutlineInputBorder(
-borderSide: BorderSide(color: Colors.grey),
-),
-),
-), */
               const SizedBox(
                 height: 7,
               ),
@@ -408,14 +455,14 @@ borderSide: BorderSide(color: Colors.grey),
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: RedNO
                             ? Colors.red
                             : Colors.blue), // Border color when focused
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
                     borderSide: BorderSide(
                         color: RedNO
                             ? Colors.red
@@ -445,15 +492,11 @@ borderSide: BorderSide(color: Colors.grey),
                 child: ElevatedButton(
                   onPressed: isSubmitButtonEnabled()
                       ? () {
+                          postData();
                           setState(() {
-                            nameController.clear();
-// fatherNameController.clear();
-                            cnicController.clear();
-                            contactNoController.clear();
-                            complaintController.clear();
-                            selectedDistrict = null;
-                            selectedTaluka = null;
+                            opendialogbox();
                           });
+
                           const snackBar = SnackBar(
                             backgroundColor: Colors.green,
                             content: Text('Submitted'),
@@ -470,7 +513,7 @@ borderSide: BorderSide(color: Colors.grey),
                     ),
                   ),
                   child: const Text(
-                    "Submit",
+                    "Register",
                     style: TextStyle(color: Colors.white, letterSpacing: 1),
                   ),
                 ),
@@ -478,11 +521,6 @@ borderSide: BorderSide(color: Colors.grey),
               const SizedBox(
                 height: 4,
               ),
-              SizedBox(
-                height: 60,
-                child: Text(
-                    " $name    $cnic  $complaint $cellnumber $selectedDistrict $_selectedTaluka  "),
-              )
             ],
           ),
         ),
@@ -503,12 +541,9 @@ class FetchAPI {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['success'] = this.success;
     data['data'] = this.data;
     return data;
   }
 }
-
-
-//https://cms.swatagriculture.gos.pk/api/store-complain
