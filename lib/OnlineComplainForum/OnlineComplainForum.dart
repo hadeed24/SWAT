@@ -15,6 +15,8 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
   String? selectedDistrict; // Initial selected district
 // Initial selected district
   List<String> districts = [];
+
+  String finalresult = "";
   Future<void> postData() async {
     final Map<String, dynamic> requestBody = {
       "name": name,
@@ -35,10 +37,10 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
 
     if (response.statusCode == 200) {
 // Handle success, you can show a success message or perform any other actions.
-      print('Complaint submitted successfully');
+      finalresult = "Complain Registered Successful";
     } else {
 // Handle error, you can show an error message or perform any other actions.
-      print('Failed to submit complaint');
+      finalresult = "Failed to submit complaint";
     }
   }
 
@@ -57,9 +59,9 @@ class _OnlineComplainForumState extends State<OnlineComplainForum> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Complain Registered Successful",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    finalresult,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(
                     height: 10,
